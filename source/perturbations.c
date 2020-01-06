@@ -659,7 +659,7 @@ int perturb_indices_of_perturbs(
         }
         ppt->max_q_size_ncdm = max_q_size;
         int Nn = pba->N_ncdm;
-        int Nl = ppr->l_max_ncdm;
+        int Nl = ppr->l_max_ncdm+1;
         int Nq = ppt->max_q_size_ncdm;
         int Nk = ppt->k_size[ppt->index_md_scalars];
 
@@ -1176,6 +1176,13 @@ int perturb_timesampling_for_sources(
 
   /** - --> allocate array of time steps, ppt->tau_sampling[index_tau] */
   class_alloc(ppt->tau_sampling,ppt->tau_size * sizeof(double),ppt->error_message);
+
+  /** WHE - allocate array for scale factor at each tau */
+  if (pba->has_ncdm) {
+      int Ntau = ppt->tau_size;
+      class_alloc(ppt->a_at_tau, sizeof(double)*Ntau,ppt->error_message);
+  }
+  /** end WHE */
 
   /** - --> repeat the same steps, now filling the array with each tau value: */
 
@@ -6232,10 +6239,12 @@ int perturb_sources(
       // double a = pvecback[pba->index_bg_a];
       // double z = 1./a - 1.;
 
+      ppt->a_at_tau[index_tau] = pvecback[pba->index_bg_a];
+
       if (z >= 40 && z < 45) {
         //Maximum size of each dimension (not necessarily filled)
         int Nn = pba->N_ncdm;
-        int Nl = ppr->l_max_ncdm;
+        int Nl = ppr->l_max_ncdm+1;
         int Nq = ppt->max_q_size_ncdm;
         int Nk = ppt->k_size[ppt->index_md_scalars];
         //Index of the first multipole of perturbation of first ncdm species, Psi_0
@@ -6250,7 +6259,7 @@ int perturb_sources(
         for (int in=0; in<Nn; in++) {
           //Fill with values for each momentum bin and multipole
           for (int iq=0; iq<ppw->pv->q_size_ncdm[in]; iq++) {
-            for (int il=0; il<ppw->pv->l_max_ncdm[in]; il++) {
+            for (int il=0; il<=ppw->pv->l_max_ncdm[in]; il++) {
               ppt->ncdm_y[il + iq*Nl + ik*Nl*Nq + in*Nl*Nq*Nk] = ppw->pv->y[idx];
               idx++;
             }
@@ -7165,6 +7174,9 @@ int perturb_derivs(double tau,
       metric_shear = k2 * pvecmetric[ppw->index_mt_alpha];
       //metric_shear_prime = k2 * pvecmetric[ppw->index_mt_alpha_prime];
       metric_ufa_class = pvecmetric[ppw->index_mt_h_prime]/2.;
+
+      // if (a>0.02 && a<0.021)
+      // printf("yoyo mofo %f %f %f %f\n", k, (1.-a)/a, pvecmetric[ppw->index_mt_h_prime], pvecmetric[ppw->index_tp_h]);
     }
 
     if (ppt->gauge == newtonian) {

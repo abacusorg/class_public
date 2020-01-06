@@ -379,6 +379,7 @@ struct perturbs
 
   //}
 
+  double * a_at_tau; //scale factor at each conformal time
   int max_q_size_ncdm; /**< maximum number of momentum bins */
   double ncdm_dump_redshift; /**< redshift corresponding to the ncdm dump
   /** end WHE */

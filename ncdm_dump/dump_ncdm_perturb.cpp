@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
 	/** WHE */
 
 	int Nn = ba.N_ncdm;
-	int Nl = pr.l_max_ncdm;
+	int Nl = pr.l_max_ncdm+1;
 	int Nq = pt.max_q_size_ncdm;
 	int Nk = pt.k_size[pt.index_md_scalars];
 
@@ -90,6 +90,30 @@ int main(int argc, char **argv) {
 
 		dumpMultipolesH5("multipoles_" + std::to_string(in) + ".h5", Nl, Nq, Nk, Psi, qcol, kcol);
 		std::cout << "  Dumped to " << "multipoles_" + std::to_string(in) + ".h5" << std::endl;
+	}
+
+	/** end WHE */
+
+	/** WHE */
+
+	std::cout << "Next, we're gonna dump some transfer functions." << std::endl;
+
+	//Get the conformal times
+	size_t Ntau = pt.tau_size;
+	float taucol[Ntau];
+	for (int it=0; it<Ntau; it++) {
+		taucol[it] = pt.tau_sampling[it];
+
+		// std::cout << taucol[it] << " " << pt.a_at_tau[it] << " " << (1./pt.a_at_tau[it] - 1.) << std::endl;
+	}
+
+	int index_ic = 0;
+	int index_md = pt.index_md_scalars;
+	int index_tau = 10;
+	for (size_t ik=0; ik<pt.k_size[index_md]; ik++) {
+		double h_prime = pt.sources[index_md][index_ic * pt.tp_size[index_md] + pt.index_tp_h_prime][index_tau * pt.k_size[index_md] + ik];
+		double rho_ncdm = pt.sources[index_md][index_ic * pt.tp_size[index_md] + pt.index_tp_delta_ncdm1][index_tau * pt.k_size[index_md] + ik];
+		// std::cout << kcol[ik] << " " << rho_ncdm << " " << h_prime << std::endl;
 	}
 
 	/** end WHE */
