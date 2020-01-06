@@ -409,6 +409,19 @@ struct perturbs
 
   //@}
 
+  /** WHE */
+  /** @name - array for ncdm multipole dump */
+
+  //@ {
+
+  double * ncdm_y;
+
+  //}
+
+  int max_q_size_ncdm; /**< maximum number of momentum bins */
+  double ncdm_dump_redshift; /**< redshift corresponding to the ncdm dump
+  /** end WHE */
+
   /** @name - technical parameters */
 
   //@{

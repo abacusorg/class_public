@@ -1084,6 +1084,35 @@ int perturb_indices_of_perturbs(
              ppt->error_message,
              ppt->error_message);
 
+    /** WHE - allocate array for ncdm multipole dump if necessary */
+    if (pba->has_ncdm) {
+        //Find the maximum q size (no. of momentum bins)
+        int max_q_size=0;
+        for (int i_ncdm=0; i_ncdm<pba->N_ncdm; i_ncdm++) {
+            if (i_ncdm==0 || pba->q_size_ncdm[i_ncdm]>max_q_size) {
+                max_q_size = pba->q_size_ncdm[i_ncdm];
+            }
+        }
+        ppt->max_q_size_ncdm = max_q_size;
+        int Nn = pba->N_ncdm;
+        int Nl = ppr->l_max_ncdm;
+        int Nq = ppt->max_q_size_ncdm;
+        int Nk = ppt->k_size[ppt->index_md_scalars];
+
+        //Initialize a guess for the ncdm dump redshift (will be updated later)
+        ppt->ncdm_dump_redshift = 45;
+
+        fprintf(stdout, "ncdm perturbation array size %i doubles\n", Nn*Nl*Nq*Nk);
+        class_alloc(ppt->ncdm_y, sizeof(double)*Nn*Nl*Nq*Nk,ppt->error_message);
+
+        //Fill the array with zeros. This is necessary if different species
+        // have different q_size or l_size
+        for (int i=0; i<Nn*Nl*Nq*Nk; i++) {
+          ppt->ncdm_y[i] = 0;
+        }
+    }
+    /** end WHE */
+
   /** - loop over modes. Initialize flags and indices which are specific to each mode. */
 
   for (index_md = 0; index_md < ppt->md_size; index_md++) {
@@ -6844,6 +6873,39 @@ int perturb_sources(
                                /pvecback[index_tp - ppt->index_tp_delta_ncdm1 + pba->index_bg_rho_ncdm1])*theta_over_k2; // N-body gauge correction
       }
     }
+
+    /** WHE - dump ncdm multipole if necessary */
+    if (pba->has_ncdm) {
+      // double a = pvecback[pba->index_bg_a];
+      // double z = 1./a - 1.;
+
+      if (z >= 40 && z < 45) {
+        //Maximum size of each dimension (not necessarily filled)
+        int Nn = pba->N_ncdm;
+        int Nl = ppr->l_max_ncdm;
+        int Nq = ppt->max_q_size_ncdm;
+        int Nk = ppt->k_size[ppt->index_md_scalars];
+        //Index of the first multipole of perturbation of first ncdm species, Psi_0
+        int idx = ppw->pv->index_pt_psi0_ncdm1;
+        //Update the ncdm dump redshift if necessary
+        if (z < ppt->ncdm_dump_redshift) {
+            ppt->ncdm_dump_redshift = z;
+        }
+        //Index of wavenumber
+        int ik = index_k;
+        //For each species & wavenumber
+        for (int in=0; in<Nn; in++) {
+          //Fill with values for each momentum bin and multipole
+          for (int iq=0; iq<ppw->pv->q_size_ncdm[in]; iq++) {
+            for (int il=0; il<ppw->pv->l_max_ncdm[in]; il++) {
+              ppt->ncdm_y[il + iq*Nl + ik*Nl*Nq + in*Nl*Nq*Nk] = ppw->pv->y[idx];
+              idx++;
+            }
+          }
+        }
+      }
+    }
+    /** end WHE */
 
     /* total velocity  */
     if (ppt->has_source_theta_tot == _TRUE_) {
