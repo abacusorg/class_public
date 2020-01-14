@@ -92,7 +92,7 @@ int input_init_from_arguments(
 
   if (input_file[0] != '\0'){
 
-    class_call(parser_read_file(input_file,&fc_input,errmsg),
+    class_call(parser_read_file_class(input_file,&fc_input,errmsg),
                errmsg,
                errmsg);
 
@@ -122,7 +122,7 @@ int input_init_from_arguments(
           continue;
         break;
       }
-      class_call(parser_init(&fc_root,
+      class_call(parser_init_class(&fc_root,
                              1,
                              fc_input.filename,
                              errmsg),
@@ -143,7 +143,7 @@ int input_init_from_arguments(
 
   if (precision_file[0] != '\0')
 
-    class_call(parser_read_file(precision_file,&fc_precision,errmsg),
+    class_call(parser_read_file_class(precision_file,&fc_precision,errmsg),
                errmsg,
                errmsg);
 
@@ -327,7 +327,7 @@ int input_init(
   if (unknown_parameters_size > 0) {
 
     /* Create file content structure with additional entries */
-    class_call(parser_init(&(fzw.fc),
+    class_call(parser_init_class(&(fzw.fc),
                            pfc->size+unknown_parameters_size,
                            pfc->filename,
                            errmsg),

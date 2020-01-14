@@ -239,6 +239,7 @@ int perturb_output_data(
           class_store_double(dataptr,tk[ppt->index_tp_delta_dr],ppt->has_source_delta_dr,storeidx);
           class_store_double(dataptr,tk[ppt->index_tp_delta_scf],ppt->has_source_delta_scf,storeidx);
           class_store_double(dataptr,tk[ppt->index_tp_delta_tot],ppt->has_source_delta_tot,storeidx);
+          class_store_double(dataptr,tk[ppt->index_tp_delta_cb],ppt->has_source_delta_cb,storeidx);
           class_store_double(dataptr,tk[ppt->index_tp_phi],ppt->has_source_phi,storeidx);
           class_store_double(dataptr,tk[ppt->index_tp_psi],ppt->has_source_psi,storeidx);
           class_store_double(dataptr,tk[ppt->index_tp_phi_prime],ppt->has_source_phi_prime,storeidx);
@@ -254,6 +255,7 @@ int perturb_output_data(
           class_store_double(dataptr,tk[ppt->index_tp_theta_g],ppt->has_source_theta_g,storeidx);
           class_store_double(dataptr,tk[ppt->index_tp_theta_b],ppt->has_source_theta_b,storeidx);
           class_store_double(dataptr,tk[ppt->index_tp_theta_cdm],ppt->has_source_theta_cdm,storeidx);
+          class_store_double(dataptr,tk[ppt->index_tp_theta_cb],ppt->has_source_theta_cb,storeidx);
           class_store_double(dataptr,tk[ppt->index_tp_theta_fld],ppt->has_source_theta_fld,storeidx);
           class_store_double(dataptr,tk[ppt->index_tp_theta_ur],ppt->has_source_theta_ur,storeidx);
           if (pba->has_ncdm == _TRUE_){
@@ -327,6 +329,7 @@ int perturb_output_titles(
       class_store_columntitle(titles,"d_dr",pba->has_dr);
       class_store_columntitle(titles,"d_scf",pba->has_scf);
       class_store_columntitle(titles,"d_tot",_TRUE_);
+      class_store_columntitle(titles,"d_cb",pba->has_cdm);
       class_store_columntitle(titles,"phi",ppt->has_source_phi);
       class_store_columntitle(titles,"psi",ppt->has_source_psi);
       class_store_columntitle(titles,"phi_prime",ppt->has_source_phi_prime);
@@ -335,13 +338,14 @@ int perturb_output_titles(
       class_store_columntitle(titles,"eta",ppt->has_source_eta);
       class_store_columntitle(titles,"eta_prime",ppt->has_source_eta_prime);
       class_store_columntitle(titles,"H_T_Nb_prime",ppt->has_source_H_T_Nb_prime);
-      class_store_columntitle(titles,"H_T_Nb_prime",ppt->has_source_k2gamma_Nb);
+      // class_store_columntitle(titles,"H_T_Nb_prime",ppt->has_source_k2gamma_Nb);
       class_store_columntitle(titles,"k2gamma_Nb",ppt->has_source_k2gamma_Nb);
     }
     if (ppt->has_velocity_transfers == _TRUE_) {
       class_store_columntitle(titles,"t_g",_TRUE_);
       class_store_columntitle(titles,"t_b",_TRUE_);
-      class_store_columntitle(titles,"t_cdm",((pba->has_cdm == _TRUE_) && (ppt->gauge != synchronous)));
+      class_store_columntitle(titles,"t_cdm",((pba->has_cdm == _TRUE_) && !(ppt->gauge == synchronous && ppt->has_Nbody_gauge_transfers == _FALSE_)));
+      class_store_columntitle(titles,"t_cb",pba->has_cdm);
       class_store_columntitle(titles,"t_fld",pba->has_fld);
       class_store_columntitle(titles,"t_ur",pba->has_ur);
       if (pba->has_ncdm == _TRUE_) {
@@ -352,7 +356,7 @@ int perturb_output_titles(
       }
       class_store_columntitle(titles,"t_dcdm",pba->has_dcdm);
       class_store_columntitle(titles,"t_dr",pba->has_dr);
-      class_store_columntitle(titles,"t__scf",pba->has_scf);
+      class_store_columntitle(titles,"t_scf",pba->has_scf);
       class_store_columntitle(titles,"t_tot",_TRUE_);
     }
   }
@@ -1169,8 +1173,11 @@ int perturb_indices_of_perturbs(
         ppt->has_source_theta_tot = _TRUE_;
         ppt->has_source_theta_g = _TRUE_;
         ppt->has_source_theta_b = _TRUE_;
-        if ((pba->has_cdm == _TRUE_) && (ppt->gauge != synchronous))
+        if ((pba->has_cdm == _TRUE_) && !(ppt->gauge == synchronous && ppt->has_Nbody_gauge_transfers == _FALSE_))
+        // if ((pba->has_cdm == _TRUE_) && (ppt->gauge != synchronous))
           ppt->has_source_theta_cdm = _TRUE_;
+        if (pba->has_cdm == _TRUE_)
+          ppt->has_source_theta_cb = _TRUE_;
         if (pba->has_dcdm == _TRUE_)
           ppt->has_source_theta_dcdm = _TRUE_;
         if (pba->has_fld == _TRUE_)
@@ -6694,9 +6701,9 @@ int perturb_sources(
 
     }
 
-    if (ppt->has_source_k2gamma_Nb == _TRUE_) {
-	  class_stop(ppt->error_message,"We need to compute the derivative of H_T_Nb_prime numerically. Written by T. Tram but not yet propagated here. See devel branch prior to merging with hmcode branch");
-    }
+    // if (ppt->has_source_k2gamma_Nb == _TRUE_) {
+	//   class_stop(ppt->error_message,"We need to compute the derivative of H_T_Nb_prime numerically. Written by T. Tram but not yet propagated here. See devel branch prior to merging with hmcode branch");
+    // }
 
     /* Bardeen potential -PHI_H = phi in Newtonian gauge */
     if (ppt->has_source_phi == _TRUE_) {
@@ -6920,7 +6927,8 @@ int perturb_sources(
 
     /* cdm and baryon velocity */
     if (ppt->has_source_theta_cb == _TRUE_) {
-      _set_source_(ppt->index_tp_theta_cb) = ppw->theta_cb;
+      _set_source_(ppt->index_tp_theta_cb) = ppw->theta_cb
+        + theta_shift; // N-body gauge correction
     }
 
     /* total velocity */
@@ -6947,8 +6955,13 @@ int perturb_sources(
 
     /* theta_cdm */
     if (ppt->has_source_theta_cdm == _TRUE_) {
-      _set_source_(ppt->index_tp_theta_cdm) = y[ppw->pv->index_pt_theta_cdm]
-        + theta_shift; // N-body gauge correction
+        if (ppt->gauge == synchronous) {
+            _set_source_(ppt->index_tp_theta_cdm) = 0.
+            + theta_shift; // N-body gauge correction
+        } else {
+            _set_source_(ppt->index_tp_theta_cdm) = y[ppw->pv->index_pt_theta_cdm]
+            + theta_shift; // N-body gauge correction
+        }
     }
 
     /* theta_dcdm */

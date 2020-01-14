@@ -1,6 +1,6 @@
 #include "parser.h"
 
-int parser_read_file(
+int parser_read_file_class(
 		     char * filename,
 		     struct file_content * pfc,
 		     ErrorMsg errmsg
@@ -24,7 +24,7 @@ int parser_read_file(
 	     errmsg,
 	     "No readable input in file %s",filename);
 
-  class_call(parser_init(pfc,counter,filename,errmsg),
+  class_call(parser_init_class(pfc,counter,filename,errmsg),
 	     errmsg,
 	     errmsg);
 
@@ -47,7 +47,7 @@ int parser_read_file(
 
 }
 
-int parser_init(
+int parser_init_class(
 		struct file_content * pfc,
 		int size,
         char * filename,

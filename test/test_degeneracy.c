@@ -221,7 +221,7 @@ int main(int argc, char **argv) {
 
   int ref_run;
   
-  parser_init(&fc,11,errmsg);
+  parser_init_class(&fc,11,errmsg);
 
   strcpy(fc.name[0],"output");
   strcpy(fc.value[0],"tCl,pCl");
