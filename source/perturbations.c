@@ -6366,7 +6366,7 @@ int perturb_einstein(
        really want gauge-dependent results) */
 
     if (ppt->has_source_delta_m == _TRUE_) {
-      ppw->delta_m += 3. *ppw->pvecback[pba->index_bg_a]*ppw->pvecback[pba->index_bg_H] * ppw->theta_m/k2;
+      // ppw->delta_m += 3. *ppw->pvecback[pba->index_bg_a]*ppw->pvecback[pba->index_bg_H] * ppw->theta_m/k2;
       // note: until 2.4.3 there was a typo, the factor was (-2 H'/H) instead
       // of (3 aH). There is the same typo in the CLASSgal paper
       // 1307.1459v1,v2,v3. It came from a confusion between (1+w_total)
@@ -6379,7 +6379,7 @@ int perturb_einstein(
     }
 
     if (ppt->has_source_delta_cb == _TRUE_) {
-      ppw->delta_cb += 3. *ppw->pvecback[pba->index_bg_a]*ppw->pvecback[pba->index_bg_H] * ppw->theta_cb/k2;//check gauge transformation
+      // ppw->delta_cb += 3. *ppw->pvecback[pba->index_bg_a]*ppw->pvecback[pba->index_bg_H] * ppw->theta_cb/k2;//check gauge transformation
     }
 
     if (ppt->has_source_theta_m == _TRUE_) {
@@ -7383,16 +7383,6 @@ int perturb_sources(
 
     }
 
-    /* total matter overdensity (gauge-invariant, defined as in arXiv:1307.1459) */
-    if (ppt->has_source_delta_m == _TRUE_) {
-      _set_source_(ppt->index_tp_delta_m) = ppw->delta_m;
-    }
-
-    /* cdm and baryon over density */
-    if (ppt->has_source_delta_cb == _TRUE_) {
-      _set_source_(ppt->index_tp_delta_cb) = ppw->delta_cb;
-    }
-
     /* compute the corrections that have to be applied to each (delta_i, theta_i) in N-body gauge */
 	if (ppt->has_Nbody_gauge_transfers == _TRUE_){
       theta_over_k2 = ppw->rho_plus_p_theta/(pvecback[pba->index_bg_rho_tot]+pvecback[pba->index_bg_p_tot])/k/k;
@@ -7403,6 +7393,18 @@ int perturb_sources(
 	  theta_over_k2 = 0.;
 	  theta_shift = 0.;
 	}
+
+    /* total matter overdensity (gauge-invariant, defined as in arXiv:1307.1459) */
+    if (ppt->has_source_delta_m == _TRUE_) {
+      _set_source_(ppt->index_tp_delta_m) = ppw->delta_m
+      + 3.*a_prime_over_a*theta_over_k2; // N-body gauge correction
+    }
+
+    /* cdm and baryon over density */
+    if (ppt->has_source_delta_cb == _TRUE_) {
+      _set_source_(ppt->index_tp_delta_cb) = ppw->delta_cb
+      + 3.*a_prime_over_a*theta_over_k2; // N-body gauge correction
+    }
 
     /* delta_tot */
     if (ppt->has_source_delta_tot == _TRUE_)  {
