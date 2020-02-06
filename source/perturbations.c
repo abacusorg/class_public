@@ -6384,12 +6384,12 @@ int perturb_einstein(
 
     if (ppt->has_source_theta_m == _TRUE_) {
       if  (ppt->gauge == synchronous) {
-        ppw->theta_m += ppw->pvecmetric[ppw->index_mt_alpha]*k2;
+        // ppw->theta_m += ppw->pvecmetric[ppw->index_mt_alpha]*k2;
       }
     }
     if (ppt->has_source_theta_cb == _TRUE_){
       if  (ppt->gauge == synchronous) {
-        ppw->theta_cb += ppw->pvecmetric[ppw->index_mt_alpha]*k2; //check gauge transformation
+        // ppw->theta_cb += ppw->pvecmetric[ppw->index_mt_alpha]*k2; //check gauge transformation
       }
     }
   }
@@ -7397,13 +7397,13 @@ int perturb_sources(
     /* total matter overdensity (gauge-invariant, defined as in arXiv:1307.1459) */
     if (ppt->has_source_delta_m == _TRUE_) {
       _set_source_(ppt->index_tp_delta_m) = ppw->delta_m
-      + 3.*a_prime_over_a*theta_over_k2; // N-body gauge correction
+        + 3.*a_prime_over_a*theta_over_k2; // N-body gauge correction
     }
 
     /* cdm and baryon over density */
     if (ppt->has_source_delta_cb == _TRUE_) {
       _set_source_(ppt->index_tp_delta_cb) = ppw->delta_cb
-      + 3.*a_prime_over_a*theta_over_k2; // N-body gauge correction
+        + 3.*a_prime_over_a*theta_over_k2; // N-body gauge correction
     }
 
     /* delta_tot */
@@ -7517,14 +7517,16 @@ int perturb_sources(
     //     + theta_shift; // N-body gauge correction
     // }
 
-    /* total matter velocity (gauge-invariant, defined as in arXiv:1307.1459) */
+    /* total matter velocity (now gauge-dependent) */
     if (ppt->has_source_theta_m == _TRUE_) {
-      _set_source_(ppt->index_tp_theta_m) = ppw->theta_m;
+      _set_source_(ppt->index_tp_theta_m) = ppw->theta_m
+        + theta_shift; // N-body gauge correction
     }
 
     /* cdm and baryon velocity */
     if (ppt->has_source_theta_cb == _TRUE_) {
-      _set_source_(ppt->index_tp_theta_cb) = ppw->theta_cb;
+      _set_source_(ppt->index_tp_theta_cb) = ppw->theta_cb
+        + theta_shift; // N-body gauge correction
     }
 
     /* total velocity */
