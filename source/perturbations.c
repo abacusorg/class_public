@@ -7394,7 +7394,7 @@ int perturb_sources(
 	  theta_shift = 0.;
 	}
 
-    /* total matter overdensity (gauge-invariant, defined as in arXiv:1307.1459) */
+    /* total matter overdensity (now gauge-dependent) */
     if (ppt->has_source_delta_m == _TRUE_) {
       _set_source_(ppt->index_tp_delta_m) = ppw->delta_m
         + 3.*a_prime_over_a*theta_over_k2; // N-body gauge correction
