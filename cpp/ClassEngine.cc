@@ -70,7 +70,7 @@ ClassEngine::ClassEngine(const ClassParams& pars): cl(0),dofree(true){
   //prepare fp structure
   size_t n=pars.size();
   //
-  parser_init(&fc,n,"pipo",_errmsg);
+  class_parser_init(&fc,n,"pipo",_errmsg);
   
   //config
   for (size_t i=0;i<pars.size();i++){
@@ -113,7 +113,7 @@ ClassEngine::ClassEngine(const ClassParams& pars,const string & precision_file):
   struct file_content fc_precision;
   fc_precision.size = 0;
   //decode pre structure
-  if (parser_read_file(const_cast<char*>(precision_file.c_str()),&fc_precision,_errmsg) == _FAILURE_){
+  if (class_parser_read_file(const_cast<char*>(precision_file.c_str()),&fc_precision,_errmsg) == _FAILURE_){
     throw invalid_argument(_errmsg);
   }
 
@@ -123,7 +123,7 @@ ClassEngine::ClassEngine(const ClassParams& pars,const string & precision_file):
   fc_input.filename=new char[1];
  //prepare fc par structure
   size_t n=pars.size();
-  parser_init(&fc_input,n,"pipo",_errmsg);
+  class_parser_init(&fc_input,n,"pipo",_errmsg);
   //config
   for (size_t i=0;i<pars.size();i++){
     strcpy(fc_input.name[i],pars.key(i).c_str());

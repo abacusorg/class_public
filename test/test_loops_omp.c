@@ -169,7 +169,7 @@ int main() {
      should be passed to the code through a file_content
      structure. Create such a structure with the size you need: 10 in
      this exemple */
-  parser_init(&fc,10,"",errmsg_parser);
+  class_parser_init(&fc,10,"",errmsg_parser);
 
   /* assign values to these 9 parameters. Some will be fixed, some
      will be varied in the loop. */
@@ -236,7 +236,7 @@ int main() {
     int j,iam;
 
     /* copy the shared file content into the local file content used by each instance */
-    parser_init(&fc_local,fc.size,"",errmsg);
+    class_parser_init(&fc_local,fc.size,"",errmsg);
     for (j=0; j < fc.size; j++) {
       strcpy(fc_local.value[j],fc.value[j]);
       strcpy(fc_local.name[j],fc.name[j]);

@@ -136,7 +136,7 @@ int main() {
      should be passed to the code through a file_content
      structure. Create such a structure with the size you need: 9 in
      this exemple */
-  parser_init(&fc,10,"",errmsg);
+  class_parser_init(&fc,10,"",errmsg);
 
   /* assign values to these 9 parameters. Some will be fixed, some
      will be varied in the loop. */

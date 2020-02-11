@@ -90,7 +90,7 @@ int main(int argc, char **argv) {
   
   l_max=2500;
 
-  parser_init(&fc,4,errmsg);
+  class_parser_init(&fc,4,errmsg);
 
   strcpy(fc.name[0],"output");
   strcpy(fc.value[0],"tCl,pCl");
