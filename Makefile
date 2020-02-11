@@ -141,13 +141,13 @@ PYTHON_FILES = python/classy.pyx python/setup.py python/cclassy.pxd python/test_
 all: class libclass.a classy libclass.so
 
 libclass.a: $(TOOLS) $(SOURCE) $(EXTERNAL)
-	$(AR)  $@ $(addprefix build/, $(TOOLS) $(SOURCE) $(EXTERNAL))
-
-libclass.so: $(TOOLS) $(SOURCE) $(EXTERNAL) $(CLASS)
-	$(CC) $(OPTFLAG) $(OMPFLAG) $(LDFLAG) -shared -o libclass.so -lm
+	$(AR) $@ $(addprefix build/, $(TOOLS) $(SOURCE) $(EXTERNAL))
 
 class: $(TOOLS) $(SOURCE) $(EXTERNAL) $(OUTPUT) $(CLASS)
 	$(CC) $(OPTFLAG) $(OMPFLAG) $(LDFLAG) -o class $(addprefix build/,$(notdir $^)) -lm
+
+libclass.so: $(TOOLS) $(SOURCE) $(EXTERNAL)
+	$(CC) $(OPTFLAG) $(OMPFLAG) $(LDFLAG) -shared -o libclass.so $(addprefix build/, $(TOOLS) $(SOURCE) $(EXTERNAL)) -lm
 
 test_sigma: $(TOOLS) $(SOURCE) $(EXTERNAL) $(OUTPUT) $(TEST_SIGMA)
 	$(CC) $(OPTFLAG) $(OMPFLAG) $(LDFLAG) -o test_sigma $(addprefix build/,$(notdir $^)) -lm
@@ -201,5 +201,6 @@ endif
 clean: .base
 	rm -rf $(WRKDIR);
 	rm -f libclass.a
+	rm -f libclass.so
 	rm -f $(MDIR)/python/classy.c
 	rm -rf $(MDIR)/python/build
