@@ -295,8 +295,6 @@ struct perturbs
   int index_tp_perturbed_recombination_delta_temp;		/**< Gas temperature perturbation */
   int index_tp_perturbed_recombination_delta_chi;		/**< Inionization fraction perturbation */
 
-  int index_tp_psi0_ncdm1; /**< index value for distribution function perturbation (l=0) of first non-cold dark matter species (e.g. massive neutrinos) */
-
   int index_tp_theta_m;     /**< index value for matter velocity fluctuation */
   int index_tp_theta_cb;    /**< index value for theta cb */
   int index_tp_theta_tot;   /**< index value for total velocity fluctuation */

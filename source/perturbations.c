@@ -235,15 +235,6 @@ int perturb_output_data(
             for (n_ncdm = 0; n_ncdm < pba->N_ncdm; n_ncdm++){
               class_store_double(dataptr,tk[ppt->index_tp_delta_ncdm1+n_ncdm],ppt->has_source_delta_ncdm,storeidx);
             }
-
-            /* Store the full perturbation if not using fluid approximation */
-            int index_source = ppt->index_tp_psi0_ncdm1;
-            for (n_ncdm = 0; n_ncdm < pba->N_ncdm; n_ncdm++){
-              for (int q_index = 0; q_index < pba->q_size_ncdm[n_ncdm]; q_index++){
-                class_store_double(dataptr,tk[index_source],_TRUE_,storeidx);
-                index_source++;
-              }
-            }
           }
           class_store_double(dataptr,tk[ppt->index_tp_delta_dcdm],ppt->has_source_delta_dcdm,storeidx);
           class_store_double(dataptr,tk[ppt->index_tp_delta_dr],ppt->has_source_delta_dr,storeidx);
@@ -338,14 +329,6 @@ int perturb_output_titles(
           sprintf(tmp,"d_ncdm[%d]",n_ncdm);
           class_store_columntitle(titles,tmp,_TRUE_);
         }
-
-        /* Store the full perturbation if not using fluid approximation */
-        for (n_ncdm = 0; n_ncdm < pba->N_ncdm; n_ncdm++){
-          for (int q_index = 0; q_index < pba->q_size_ncdm[n_ncdm]; q_index++){
-            sprintf(tmp,"psi0_ncdm[%d][%d]",n_ncdm,q_index);
-            class_store_columntitle(titles,tmp,_TRUE_);
-          }
-        }
       }
       class_store_columntitle(titles,"d_dcdm",pba->has_dcdm);
       class_store_columntitle(titles,"d_dr",pba->has_dr);
@@ -378,7 +361,7 @@ int perturb_output_titles(
       class_store_columntitle(titles,"t_dcdm",pba->has_dcdm);
       class_store_columntitle(titles,"t_dr",pba->has_dr);
       class_store_columntitle(titles,"t__scf",pba->has_scf);
-      class_store_columntitle(titles,"t_tot",ppt->index_tp_theta_tot);
+      class_store_columntitle(titles,"t_tot",_TRUE_);
     }
   }
 
@@ -1275,13 +1258,6 @@ int perturb_indices_of_perturbs(
       class_define_index(ppt->index_tp_delta_idr,  ppt->has_source_delta_idr, index_type,1);
       class_define_index(ppt->index_tp_delta_idm_dr,  ppt->has_source_delta_idm_dr, index_type,1);
       class_define_index(ppt->index_tp_delta_ncdm1,ppt->has_source_delta_ncdm,index_type,pba->N_ncdm);
-
-      /* We have one source function per momentum bin per ncdm species */
-      int source_size = 0;
-      for (int n_ncdm = 0; n_ncdm < pba->N_ncdm; n_ncdm++) {
-          source_size += pba->q_size_ncdm[n_ncdm];
-      }
-      class_define_index(ppt->index_tp_psi0_ncdm1, ppt->has_source_delta_ncdm,index_type,source_size);
       class_define_index(ppt->index_tp_theta_m,    ppt->has_source_theta_m,   index_type,1);
       class_define_index(ppt->index_tp_theta_cb,   ppt->has_source_theta_cb,  index_type,1);
       class_define_index(ppt->index_tp_theta_tot,  ppt->has_source_theta_tot, index_type,1);
@@ -7532,19 +7508,6 @@ int perturb_sources(
         _set_source_(index_tp) = ppw->delta_ncdm[index_tp - ppt->index_tp_delta_ncdm1]
           + 3.*a_prime_over_a*(1+pvecback[index_tp - ppt->index_tp_delta_ncdm1 + pba->index_bg_p_ncdm1]
                                /pvecback[index_tp - ppt->index_tp_delta_ncdm1 + pba->index_bg_rho_ncdm1])*theta_over_k2; // N-body gauge correction
-      }
-    }
-
-    /* Store the full perturbation if not using fluid approximation */
-    if (ppt->has_source_delta_ncdm == _TRUE_) {
-      int index_y = ppw->pv->index_pt_psi0_ncdm1;
-      int index_source = ppt->index_tp_psi0_ncdm1;
-      for (int n_ncdm = 0; n_ncdm < pba->N_ncdm; n_ncdm++){
-        for (int q_index = 0; q_index < pba->q_size_ncdm[n_ncdm]; q_index++){
-          _set_source_(index_source) = y[index_y];
-          index_y+=(ppw->pv->l_max_ncdm[n_ncdm]+1); //jump to next momentum bin
-          index_source++;
-        }
       }
     }
 
