@@ -1597,10 +1597,15 @@ int perturb_timesampling_for_sources(
                pba->error_message,
                ppt->error_message);
 
+    double z = 1./pvecback[pba->index_bg_a]-1.;
+    double zmax = pth->z_table[pth->tt_size-1];
+    char th_interp_mode = fabs(z - zmax)/zmax > 0.05 ? pth->inter_normal
+                                                   : pth->inter_closeby;
+
     class_call(thermodynamics_at_z(pba,
                                    pth,
-                                   1./pvecback[pba->index_bg_a]-1.,  /* redshift z=1/a-1 */
-                                   pth->inter_closeby,
+                                   z,  /* redshift z=1/a-1 */
+                                   th_interp_mode,
                                    &last_index_thermo,
                                    pvecback,
                                    pvecthermo),
@@ -1680,10 +1685,15 @@ int perturb_timesampling_for_sources(
                pba->error_message,
                ppt->error_message);
 
+    double z = 1./pvecback[pba->index_bg_a]-1.;
+    double zmax = pth->z_table[pth->tt_size-1];
+    char th_interp_mode = fabs(z - zmax)/zmax > 0.05 ? pth->inter_normal
+                                                   : pth->inter_closeby;
+
     class_call(thermodynamics_at_z(pba,
                                    pth,
-                                   1./pvecback[pba->index_bg_a]-1.,  /* redshift z=1/a-1 */
-                                   pth->inter_closeby,
+                                   z,  /* redshift z=1/a-1 */
+                                   th_interp_mode,
                                    &last_index_thermo,
                                    pvecback,
                                    pvecthermo),
