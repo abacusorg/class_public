@@ -261,6 +261,7 @@ struct perturbs
   short has_source_theta_ncdm;  /**< do we need source for theta of all non-cold dark matter species (e.g. massive neutrinos)? */
   short has_source_shear_ncdm;  /**< do we need source for shear of all non-cold dark matter species (e.g. massive neutrinos)? */
   short has_source_cs2_ncdm;    /**< do we need source for squared sound speed of all non-cold dark matter species (e.g. massive neutrinos)? */
+  short has_source_l3_ncdm;     /**< do we need source for l=3 moment of all non-cold dark matter species (e.g. massive neutrinos)? */
   short has_source_phi;         /**< do we need source for metric fluctuation phi? */
   short has_source_phi_prime;   /**< do we need source for metric fluctuation phi'? */
   short has_source_phi_plus_psi;/**< do we need source for metric fluctuation (phi+psi)? */
@@ -313,7 +314,8 @@ struct perturbs
   int index_tp_theta_ncdm1; /**< index value for theta of first non-cold dark matter species (e.g. massive neutrinos) */
 
   int index_tp_shear_ncdm1; /**< index value for shear of first non-cold dark matter species (e.g. massive neutrinos) */
-  int index_tp_cs2_ncdm1; /**< index value for squared sound speed dp/drho of first non-cold dark matter species (e.g. massive neutrinos) */
+  int index_tp_cs2_ncdm1;   /**< index value for squared sound speed dp/drho of first non-cold dark matter species (e.g. massive neutrinos) */
+  int index_tp_l3_ncdm1;    /**< index value for l=3 moment of first non-cold dark matter species (e.g. massive neutrinos) */
 
   int index_tp_phi;          /**< index value for metric fluctuation phi */
   int index_tp_phi_prime;    /**< index value for metric fluctuation phi' */
@@ -587,6 +589,7 @@ struct perturb_workspace
   double * theta_ncdm;	/**< velocity divergence theta of each ncdm species */
   double * shear_ncdm;	/**< shear for each ncdm species */
   double * delta_p_over_delta_rho_ncdm;	/**< squared sound speed for each ncdm species */
+  double * l3_ncdm;	    /**< l=3 moment for each ncdm species */
 
   double delta_m;	/**< relative density perturbation of all non-relativistic species */
   double theta_m;	/**< velocity divergence theta of all non-relativistic species */

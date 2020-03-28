@@ -275,6 +275,9 @@ int perturb_output_data(
             for (n_ncdm = 0; n_ncdm < pba->N_ncdm; n_ncdm++){
               class_store_double(dataptr,tk[ppt->index_tp_cs2_ncdm1+n_ncdm],ppt->has_source_cs2_ncdm,storeidx);
             }
+            for (n_ncdm = 0; n_ncdm < pba->N_ncdm; n_ncdm++){
+              class_store_double(dataptr,tk[ppt->index_tp_l3_ncdm1+n_ncdm],ppt->has_source_l3_ncdm,storeidx);
+            }
           }
 
         }
@@ -377,6 +380,10 @@ int perturb_output_titles(
         }
         for (n_ncdm=0; n_ncdm < pba->N_ncdm; n_ncdm++) {
           sprintf(tmp,"cs2_ncdm[%d]",n_ncdm);
+          class_store_columntitle(titles,tmp,_TRUE_);
+        }
+        for (n_ncdm=0; n_ncdm < pba->N_ncdm; n_ncdm++) {
+          sprintf(tmp,"l3_ncdm[%d]",n_ncdm);
           class_store_columntitle(titles,tmp,_TRUE_);
         }
       }
@@ -1082,6 +1089,7 @@ int perturb_indices_of_perturbs(
   ppt->has_source_theta_ncdm = _FALSE_;
   ppt->has_source_shear_ncdm = _FALSE_;
   ppt->has_source_cs2_ncdm = _FALSE_;
+  ppt->has_source_l3_ncdm = _FALSE_;
   ppt->has_source_phi = _FALSE_;
   ppt->has_source_phi_prime = _FALSE_;
   ppt->has_source_phi_plus_psi = _FALSE_;
@@ -1214,6 +1222,7 @@ int perturb_indices_of_perturbs(
         if (pba->has_ncdm == _TRUE_) {
           ppt->has_source_shear_ncdm = _TRUE_;
           ppt->has_source_cs2_ncdm = _TRUE_;
+          ppt->has_source_l3_ncdm = _TRUE_;
         }
       }
 
@@ -1302,6 +1311,7 @@ int perturb_indices_of_perturbs(
       class_define_index(ppt->index_tp_theta_ncdm1,ppt->has_source_theta_ncdm,index_type,pba->N_ncdm);
       class_define_index(ppt->index_tp_shear_ncdm1,ppt->has_source_shear_ncdm,index_type,pba->N_ncdm);
       class_define_index(ppt->index_tp_cs2_ncdm1,  ppt->has_source_cs2_ncdm,index_type,pba->N_ncdm);
+      class_define_index(ppt->index_tp_l3_ncdm1,   ppt->has_source_l3_ncdm,index_type,pba->N_ncdm);
       class_define_index(ppt->index_tp_phi,        ppt->has_source_phi,       index_type,1);
       class_define_index(ppt->index_tp_phi_prime,  ppt->has_source_phi_prime, index_type,1);
       class_define_index(ppt->index_tp_phi_plus_psi,ppt->has_source_phi_plus_psi,index_type,1);
@@ -2657,6 +2667,7 @@ int perturb_workspace_init(
       class_alloc(ppw->theta_ncdm,pba->N_ncdm*sizeof(double),ppt->error_message);
       class_alloc(ppw->shear_ncdm,pba->N_ncdm*sizeof(double),ppt->error_message);
       class_alloc(ppw->delta_p_over_delta_rho_ncdm,pba->N_ncdm*sizeof(double),ppt->error_message);
+      class_alloc(ppw->l3_ncdm,pba->N_ncdm*sizeof(double),ppt->error_message);
 
     }
 
@@ -2696,6 +2707,7 @@ int perturb_workspace_free (
       free(ppw->theta_ncdm);
       free(ppw->shear_ncdm);
       free(ppw->delta_p_over_delta_rho_ncdm);
+      free(ppw->l3_ncdm);
     }
   }
 
@@ -4051,7 +4063,7 @@ int perturb_vector_init(
       for(n_ncdm = 0; n_ncdm < ppv-> N_ncdm; n_ncdm++){
         for(index_q=0; index_q < ppv->q_size_ncdm[n_ncdm]; index_q++){
           for(l=0; l<=ppv->l_max_ncdm[n_ncdm]; l++){
-            if (l>2) ppv->used_in_sources[index_pt]=_FALSE_;
+            if (l>3) ppv->used_in_sources[index_pt]=_FALSE_;
             index_pt++;
           }
         }
@@ -6503,6 +6515,7 @@ int perturb_total_stress_energy(
   double rho_plus_p_theta_ncdm=0.;
   double rho_plus_p_shear_ncdm=0.;
   double delta_p_ncdm=0.;
+  double rho_l3_ncdm=0.;
   double factor;
   double rho_plus_p_ncdm;
   int index_q,n_ncdm,idx;
@@ -6768,6 +6781,7 @@ int perturb_total_stress_energy(
             ppw->theta_ncdm[n_ncdm] = y[idx+1];
             ppw->shear_ncdm[n_ncdm] = y[idx+2];
             ppw->delta_p_over_delta_rho_ncdm[n_ncdm] = cg2_ncdm;
+            ppw->l3_ncdm[n_ncdm] = 0.f; // (not correct, but not used; see 3.5 in 1104.2935)
           }
 
           ppw->delta_rho += rho_ncdm_bg*y[idx];
@@ -6787,6 +6801,7 @@ int perturb_total_stress_energy(
           rho_plus_p_theta_ncdm = 0.0;
           rho_plus_p_shear_ncdm = 0.0;
           delta_p_ncdm = 0.0;
+          rho_l3_ncdm = 0.0;
           factor = pba->factor_ncdm[n_ncdm]*pow(pba->a_today/a,4);
 
           for (index_q=0; index_q < ppw->pv->q_size_ncdm[n_ncdm]; index_q ++) {
@@ -6799,6 +6814,7 @@ int perturb_total_stress_energy(
             rho_plus_p_theta_ncdm += q2*q*pba->w_ncdm[n_ncdm][index_q]*y[idx+1];
             rho_plus_p_shear_ncdm += q2*q2/epsilon*pba->w_ncdm[n_ncdm][index_q]*y[idx+2];
             delta_p_ncdm += q2*q2/epsilon*pba->w_ncdm[n_ncdm][index_q]*y[idx];
+            rho_l3_ncdm += q2*epsilon*pba->w_ncdm[n_ncdm][index_q]*y[idx+3];
 
             //Jump to next momentum bin:
             idx+=(ppw->pv->l_max_ncdm[n_ncdm]+1);
@@ -6808,6 +6824,7 @@ int perturb_total_stress_energy(
           rho_plus_p_theta_ncdm *= k*factor;
           rho_plus_p_shear_ncdm *= 2.0/3.0*factor;
           delta_p_ncdm *= factor/3.;
+          rho_l3_ncdm *= factor;
 
           if ((ppt->has_source_delta_ncdm == _TRUE_) || (ppt->has_source_theta_ncdm == _TRUE_) || (ppt->has_source_delta_m == _TRUE_)) {
             ppw->delta_ncdm[n_ncdm] = rho_delta_ncdm/ppw->pvecback[pba->index_bg_rho_ncdm1+n_ncdm];
@@ -6816,6 +6833,7 @@ int perturb_total_stress_energy(
             ppw->shear_ncdm[n_ncdm] = rho_plus_p_shear_ncdm/
               (ppw->pvecback[pba->index_bg_rho_ncdm1+n_ncdm]+ppw->pvecback[pba->index_bg_p_ncdm1+n_ncdm]);
             ppw->delta_p_over_delta_rho_ncdm[n_ncdm] = delta_p_ncdm/rho_delta_ncdm;
+            ppw->l3_ncdm[n_ncdm] = rho_l3_ncdm/ppw->pvecback[pba->index_bg_rho_ncdm1+n_ncdm];
           }
 
           ppw->delta_rho += rho_delta_ncdm;
@@ -7674,6 +7692,13 @@ int perturb_sources(
     if (ppt->has_source_cs2_ncdm == _TRUE_) {
       for (index_tp = ppt->index_tp_cs2_ncdm1; index_tp < ppt->index_tp_cs2_ncdm1+pba->N_ncdm; index_tp++) {
         _set_source_(index_tp) = ppw->delta_p_over_delta_rho_ncdm[index_tp - ppt->index_tp_cs2_ncdm1];
+      }
+    }
+
+    /* l3_ncdm (l=3 moment) */
+    if (ppt->has_source_l3_ncdm == _TRUE_) {
+      for (index_tp = ppt->index_tp_l3_ncdm1; index_tp < ppt->index_tp_l3_ncdm1+pba->N_ncdm; index_tp++) {
+        _set_source_(index_tp) = ppw->l3_ncdm[index_tp - ppt->index_tp_l3_ncdm1];
       }
     }
   }
