@@ -358,7 +358,7 @@ int perturb_output_titles(
     if (ppt->has_velocity_transfers == _TRUE_) {
       class_store_columntitle(titles,"t_g",_TRUE_);
       class_store_columntitle(titles,"t_b",_TRUE_);
-      class_store_columntitle(titles,"t_cdm",((pba->has_cdm == _TRUE_) && (ppt->gauge != synchronous)));
+      class_store_columntitle(titles,"t_cdm",((pba->has_cdm == _TRUE_) && !(ppt->gauge == synchronous && ppt->has_Nbody_gauge_transfers == _FALSE_)));
       class_store_columntitle(titles,"t_idm_dr",pba->has_idm_dr);
       class_store_columntitle(titles,"t_fld",pba->has_fld);
       class_store_columntitle(titles,"t_ur",pba->has_ur);
@@ -371,7 +371,7 @@ int perturb_output_titles(
       }
       class_store_columntitle(titles,"t_dcdm",pba->has_dcdm);
       class_store_columntitle(titles,"t_dr",pba->has_dr);
-      class_store_columntitle(titles,"t__scf",pba->has_scf);
+      class_store_columntitle(titles,"t_scf",pba->has_scf);
       class_store_columntitle(titles,"t_tot",_TRUE_);
       if (pba->has_ncdm == _TRUE_) {
         for (n_ncdm=0; n_ncdm < pba->N_ncdm; n_ncdm++) {
@@ -1199,7 +1199,7 @@ int perturb_indices_of_perturbs(
         ppt->has_source_theta_tot = _TRUE_;
         ppt->has_source_theta_g = _TRUE_;
         ppt->has_source_theta_b = _TRUE_;
-        if ((pba->has_cdm == _TRUE_) && (ppt->gauge != synchronous))
+        if ((pba->has_cdm == _TRUE_) && !(ppt->gauge == synchronous && ppt->has_Nbody_gauge_transfers == _FALSE_))
           ppt->has_source_theta_cdm = _TRUE_;
         if (pba->has_dcdm == _TRUE_)
           ppt->has_source_theta_dcdm = _TRUE_;
@@ -7609,8 +7609,13 @@ int perturb_sources(
 
     /* theta_cdm */
     if (ppt->has_source_theta_cdm == _TRUE_) {
-      _set_source_(ppt->index_tp_theta_cdm) = y[ppw->pv->index_pt_theta_cdm]
-        + theta_shift; // N-body gauge correction
+      if (ppt->gauge == newtonian) {
+        _set_source_(ppt->index_tp_theta_cdm) = y[ppw->pv->index_pt_theta_cdm]
+          + theta_shift; // N-body gauge correction
+      } else { //theta_cdm = 0 in synchronous gauge
+        _set_source_(ppt->index_tp_theta_cdm) = 0.0
+          + theta_shift; // N-body gauge correction
+      }
     }
 
     /* theta_idm_dr */
