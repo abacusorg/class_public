@@ -2516,7 +2516,7 @@ int input_read_parameters(
   }
 
   /** Do we want density and velocity transfer functions in Nbody gauge? */
-  if ((ppt->has_density_transfers == _TRUE_) || (ppt->has_velocity_transfers == _TRUE_)){
+  if ((ppt->has_density_transfers == _TRUE_) || (ppt->has_velocity_transfers == _TRUE_) || (ppt->has_pk_matter == _TRUE_)) {
     class_call(parser_read_string(pfc,"Nbody gauge transfer functions",&string1,&flag1,errmsg),
 	       errmsg,
 	       errmsg);
