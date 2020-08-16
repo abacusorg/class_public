@@ -7,6 +7,10 @@
 #include "evolver_ndf15.h"
 #include "evolver_rkck.h"
 
+/* We define extra functions that are not in default CLASS */
+#define delta_shift_Nb_defined 1
+#define extra_neutrino_functions_defined 1
+
 #define _scalars_ ((ppt->has_scalars == _TRUE_) && (index_md == ppt->index_md_scalars))
 #define _vectors_ ((ppt->has_vectors == _TRUE_) && (index_md == ppt->index_md_vectors))
 #define _tensors_ ((ppt->has_tensors == _TRUE_) && (index_md == ppt->index_md_tensors))
