@@ -2394,7 +2394,7 @@ int background_derivs(
   pvecback = pbpaw->pvecback;
 
   /** - calculate functions of \f$ a \f$ with background_functions() */
-  class_call(background_functions(pba, y, pba->normal_info, pvecback),
+  class_call(background_functions(pba, y, pba->long_info, pvecback),
              pba->error_message,
              error_message);
 
@@ -2416,11 +2416,7 @@ int background_derivs(
   dy[pba->index_bi_rs] = 1./sqrt(3.*(1.+3.*pvecback[pba->index_bg_rho_b]/4./pvecback[pba->index_bg_rho_g]))*sqrt(1.-pba->K*y[pba->index_bi_rs]*y[pba->index_bi_rs]); // TBC: curvature correction
 
   /** - solve second order growth equation  \f$ [D''(\tau)=-aHD'(\tau)+3/2 a^2 \rho_M D(\tau) \f$ */
-  rho_M = pvecback[pba->index_bg_rho_b];
-  if (pba->has_cdm)
-    rho_M += pvecback[pba->index_bg_rho_cdm];
-  if (pba->has_idm_dr)
-    rho_M += pvecback[pba->index_bg_rho_idm_dr];
+  rho_M = pvecback[pba->index_bg_Omega_m] * pvecback[pba->index_bg_rho_crit];
 
   dy[pba->index_bi_D] = y[pba->index_bi_D_prime];
   dy[pba->index_bi_D_prime] = -a*H*y[pba->index_bi_D_prime] + 1.5*a*a*rho_M*y[pba->index_bi_D];
