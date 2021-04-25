@@ -5,6 +5,9 @@
 
 #include "thermodynamics.h"
 
+/* We define extra functions that are not in default CLASS */
+#define delta_shift_Nb_defined 1
+
 #define _scalars_ ((ppt->has_scalars == _TRUE_) && (index_md == ppt->index_md_scalars))
 #define _vectors_ ((ppt->has_vectors == _TRUE_) && (index_md == ppt->index_md_vectors))
 #define _tensors_ ((ppt->has_tensors == _TRUE_) && (index_md == ppt->index_md_tensors))
@@ -267,6 +270,7 @@ struct perturbations
   short has_source_eta_prime;  /**< do we need source for metric fluctuation eta'? */
   short has_source_H_T_Nb_prime; /**< do we need source for metric fluctuation H_T_Nb'? */
   short has_source_k2gamma_Nb; /**< do we need source for metric fluctuation gamma in Nbody gauge? */
+  short has_source_delta_shift_Nb_m;  /**< do we need source for density Nbody gauge shift? */
 
 
   /* remember that the temperature source function includes three
@@ -319,6 +323,7 @@ struct perturbations
   int index_tp_eta_prime;    /**< index value for metric fluctuation eta' */
   int index_tp_H_T_Nb_prime; /**< index value for metric fluctuation H_T_Nb' */
   int index_tp_k2gamma_Nb;   /**< index value for metric fluctuation gamma times k^2 in Nbody gauge */
+  int index_tp_delta_shift_Nb_m; /**< index value for density Nbody gauge shift */
 
   int * tp_size; /**< number of types tp_size[index_md] included in computation for each mode */
 
