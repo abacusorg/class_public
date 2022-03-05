@@ -26,37 +26,49 @@ struct file_content {
 extern "C" {
 #endif
 
-  int parser_init(struct file_content * pfc,
-                  int size,
-                  char * filename,
-                  ErrorMsg errmsg);
+int parser_read_file(
+		     const char * filename,
+		     struct file_content * pfc,
+		     ErrorMsg errmsg
+		     );
 
-  int parser_free(struct file_content * pfc);
+int parser_init(
+		struct file_content * pfc,
+		int size,
+    const char * filename,
+		ErrorMsg errmsg
+		);
 
+int parser_free(
+		struct file_content * pfc
+		);
 
-  int parser_read_file(char * filename,
-                       struct file_content * pfc,
-                       ErrorMsg errmsg);
+int parser_read_line(
+		char * line,
+		int * is_data,
+		char * name,
+		char * value,
+		ErrorMsg errmsg
+		);
 
-  int parser_read_line(char * line,
-                       int * is_data,
-                       char * name,
-                       char * value,
-                       ErrorMsg errmsg);
+int parser_read_int(
+		    struct file_content * pfc,
+		    char * name,
+		    int * value,
+		    int * found,
+		    ErrorMsg errmsg
+		    );
 
-  int parser_read_int(struct file_content * pfc,
-                      char * name,
-                      int * value,
-                      int * found,
-                      ErrorMsg errmsg);
+int parser_read_double(
+		    struct file_content * pfc,
+		    char * name,
+		    double * value,
+		    int * found,
+		    ErrorMsg errmsg
+		    );
 
-  int parser_read_double(struct file_content * pfc,
-                         char * name,
-                         double * value,
-                         int * found,
-                         ErrorMsg errmsg);
-
-  int parser_read_double_and_position(struct file_content * pfc,
+  int parser_read_double_and_position(
+                                      struct file_content * pfc,
                                       char * name,
                                       double * value,
                                       int * position,
