@@ -1473,8 +1473,8 @@ int perturbations_indices(
           ppt->has_source_eta = _TRUE_;
           ppt->has_source_eta_prime = _TRUE_;
         }
-        ppt->has_source_H_T_Nb_prime = _TRUE_;
-        ppt->has_source_k2gamma_Nb = _TRUE_;
+        //ppt->has_source_H_T_Nb_prime = _TRUE_;
+        //ppt->has_source_k2gamma_Nb = _TRUE_;
       }
 
       if (ppt->has_Nbody_gauge_transfers == _TRUE_){
