@@ -1385,7 +1385,6 @@ int perturbations_indices(
       if (ppt->has_density_transfers == _TRUE_) {
         ppt->has_lss = _TRUE_;
         ppt->has_source_delta_tot = _TRUE_;
-        ppt->has_source_delta_m = _TRUE_;
         ppt->has_source_delta_g = _TRUE_;
         ppt->has_source_delta_b = _TRUE_;
         if (pba->has_cdm == _TRUE_)
