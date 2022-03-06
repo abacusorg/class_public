@@ -486,6 +486,7 @@ int perturbations_output_data(
           class_store_double(dataptr,tk[ppt->index_tp_eta_prime],ppt->has_source_eta_prime,storeidx);
           class_store_double(dataptr,tk[ppt->index_tp_H_T_Nb_prime],ppt->has_source_H_T_Nb_prime,storeidx);
           class_store_double(dataptr,tk[ppt->index_tp_k2gamma_Nb],ppt->has_source_k2gamma_Nb,storeidx);
+          class_store_double(dataptr,tk[ppt->index_tp_delta_shift_Nb_m],ppt->has_source_delta_shift_Nb_m,storeidx);
         }
         if (ppt->has_velocity_transfers == _TRUE_) {
 
@@ -575,6 +576,7 @@ int perturbations_output_titles(
       class_store_columntitle(titles,"eta_prime",ppt->has_source_eta_prime);
       class_store_columntitle(titles,"H_T_Nb_prime",ppt->has_source_H_T_Nb_prime);
       class_store_columntitle(titles,"k2gamma_Nb",ppt->has_source_k2gamma_Nb);
+      class_store_columntitle(titles,"delta_shift_Nb_m",ppt->has_source_delta_shift_Nb_m);
     }
     if (ppt->has_velocity_transfers == _TRUE_) {
       class_store_columntitle(titles,"t_g",_TRUE_);
@@ -1316,6 +1318,7 @@ int perturbations_indices(
   ppt->has_source_eta_prime = _FALSE_;
   ppt->has_source_H_T_Nb_prime = _FALSE_;
   ppt->has_source_k2gamma_Nb = _FALSE_;
+  ppt->has_source_delta_shift_Nb_m = _FALSE_;
 
   /** - source flags and indices, for sources that all modes have in
       common (temperature, polarization, ...). For temperature, the
@@ -1416,7 +1419,7 @@ int perturbations_indices(
         ppt->has_source_theta_tot = _TRUE_;
         ppt->has_source_theta_g = _TRUE_;
         ppt->has_source_theta_b = _TRUE_;
-        if ((pba->has_cdm == _TRUE_) && (ppt->gauge != synchronous))
+        if ((pba->has_cdm == _TRUE_) && (ppt->gauge != synchronous || ppt->has_Nbody_gauge_transfers == _TRUE_))
           ppt->has_source_theta_cdm = _TRUE_;
         if (pba->has_dcdm == _TRUE_)
           ppt->has_source_theta_dcdm = _TRUE_;
@@ -1474,6 +1477,7 @@ int perturbations_indices(
           ppt->has_source_eta_prime = _TRUE_;
         }
         ppt->has_source_H_T_Nb_prime = _TRUE_;
+        ppt->has_source_delta_shift_Nb_m = _TRUE_;
         ppt->has_source_k2gamma_Nb = _TRUE_;
       }
 
@@ -1483,6 +1487,7 @@ int perturbations_indices(
           ppt->has_source_eta_prime = _TRUE_;
         }
         ppt->has_source_H_T_Nb_prime = _TRUE_;
+        ppt->has_source_delta_shift_Nb_m = _TRUE_;
         /** gamma is not neccessary for converting output to Nbody gauge but is included anyway. */
         ppt->has_source_k2gamma_Nb = _TRUE_;
       }
@@ -1528,6 +1533,7 @@ int perturbations_indices(
       class_define_index(ppt->index_tp_eta_prime,  ppt->has_source_eta_prime, index_type,1);
       class_define_index(ppt->index_tp_H_T_Nb_prime,ppt->has_source_H_T_Nb_prime,index_type,1);
       class_define_index(ppt->index_tp_k2gamma_Nb, ppt->has_source_k2gamma_Nb,index_type,1);
+      class_define_index(ppt->index_tp_delta_shift_Nb_m, ppt->has_source_delta_shift_Nb_m,index_type,1);
       ppt->tp_size[index_md] = index_type;
 
       class_test(index_type == 0,
@@ -1862,7 +1868,7 @@ int perturbations_timesampling_for_sources(
     class_call(thermodynamics_at_z(pba,
                                    pth,
                                    1./pvecback[pba->index_bg_a]-1.,  /* redshift z=1/a-1 */
-                                   inter_closeby,
+                                   inter_normal,
                                    &last_index_thermo,
                                    pvecback,
                                    pvecthermo),
@@ -1945,7 +1951,7 @@ int perturbations_timesampling_for_sources(
     class_call(thermodynamics_at_z(pba,
                                    pth,
                                    1./pvecback[pba->index_bg_a]-1.,  /* redshift z=1/a-1 */
-                                   inter_closeby,
+                                   inter_normal,
                                    &last_index_thermo,
                                    pvecback,
                                    pvecthermo),
@@ -7717,6 +7723,11 @@ int perturbations_sources(
 	  theta_shift = 0.;
 	}
 
+    /* delta_shift_Nb_m = 3 * a_prime_over_a * theta_over_k2 source function */
+    if (ppt->has_source_delta_shift_Nb_m == _TRUE_) {
+      _set_source_(ppt->index_tp_delta_shift_Nb_m) = 3.*a_prime_over_a*theta_over_k2;
+    }
+
     /* delta_tot */
     if (ppt->has_source_delta_tot == _TRUE_)  {
 
@@ -7862,8 +7873,13 @@ int perturbations_sources(
 
     /* theta_cdm */
     if (ppt->has_source_theta_cdm == _TRUE_) {
-      _set_source_(ppt->index_tp_theta_cdm) = y[ppw->pv->index_pt_theta_cdm]
-        + theta_shift; // N-body gauge correction
+      if (ppt->gauge == synchronous) {
+        _set_source_(ppt->index_tp_theta_cdm) = 0.
+          + theta_shift; // N-body gauge correction
+      } else {
+        _set_source_(ppt->index_tp_theta_cdm) = y[ppw->pv->index_pt_theta_cdm]
+          + theta_shift; // N-body gauge correction
+      }
     }
 
     /* theta_idm_dr */
