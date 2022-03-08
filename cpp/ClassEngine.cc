@@ -715,7 +715,7 @@ double ClassEngine::get_Hz(double z)
 
   double H_z=pvecback[ba.index_bg_H];
 
-  return(H_z);
+  return H_z;
 
 }
 
