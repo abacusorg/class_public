@@ -735,9 +735,9 @@ double ClassEngine::get_Da(double z)
   background_at_tau(&ba,tau,long_info,inter_normal, &index, pvecback);
 
 
-  double H_z=pvecback[ba.index_bg_H];
   double D_ang=pvecback[ba.index_bg_ang_distance];
 #ifdef DBUG
+  double H_z=pvecback[ba.index_bg_H];
   cout << "H_z= "<< H_z <<endl;
   cout << "D_ang= "<< D_ang <<endl;
 #endif
