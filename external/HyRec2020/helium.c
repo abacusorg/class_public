@@ -24,6 +24,7 @@
 #include <math.h>
 #include <string.h>
 #include "helium.h"
+#include "common.h"
 
 /************************************************************************************************
 Gets xe in He II + III equilibrium
@@ -154,9 +155,9 @@ double rec_helium_dxHeIIdlna(HYREC_DATA *data, double z, double xH1, double xHeI
 
   /* Optical depth, escape prob in x2p */
   tau2p   = 4.277e-8 * nH/H * xHeI /(fsR*meR*meR);
-  dnuline = g2pinc * tau2p / (4.*M_PI*M_PI);
+  dnuline = g2pinc * tau2p / (4.*_PI_*_PI_);
   tauc    = dnuline/etacinv;
-  enh     = sqrt(1.+M_PI*M_PI*tauc) + 7.74*tauc/(1.+70.*tauc);
+  enh     = sqrt(1.+_PI_*_PI_*tauc) + 7.74*tauc/(1.+70.*tauc);
   pesc    = enh / tau2p;
 
 

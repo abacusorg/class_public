@@ -6,6 +6,7 @@
  */
 
 #include "hyperspherical.h"
+#include "common.h"
 
 int hyperspherical_HIS_create(int K,
                               double beta,
@@ -802,7 +803,7 @@ int CF1_from_Gegenbauer(int l,
     w2 = w*w;
     if (alpha > cscK){
       S = alpha*log((sqrt(w2-1.0)+sqrt(w2+alpha2))*one_over_sqrt_one_plus_alpha2)+
-        atan(one_over_alpha*sqrt((w2+alpha2)/(w2-1.0)))-M_PI_2;
+        atan(one_over_alpha*sqrt((w2+alpha2)/(w2-1.0)))-_PIHALF_;
       airy_sign = -1;
     }
     else{
